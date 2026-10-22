@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Club Members</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 16px 19px;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 16px;
+    color: #212529;
+    background: #fff;
+  }
+  h3 { font-size: 1.75rem; font-weight: 500; margin: 0 0 20px; }
+  input[type="text"] {
+    display: block;
+    width: 100%;
+    padding: 10px 14px;
+    margin-bottom: 18px;
+    font: inherit;
+    font-size: 1rem;
+    color: #212529;
+    background: #e8eefc;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+  }
+  input[type="text"]:focus { outline: 2px solid #0d6efd; outline-offset: 1px; }
+  button {
+    padding: 8px 14px;
+    font: inherit;
+    color: #fff;
+    background: #0d6efd;
+    border: 1px solid #0d6efd;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  button:hover { background: #0b5ed7; }
+  button:focus-visible { outline: 2px solid #0a58ca; outline-offset: 2px; }
+  #message { min-height: 1.4em; margin: 10px 0 0; font-size: .95rem; color: #842029; }
+  #members {
+    margin-top: 16px;
+    padding: 18px 18px 10px;
+    background: crimson;
+    color: #b6f000;
+    border-radius: 6px;
+    font-size: 1.3rem;
+    line-height: 1.55;
+  }
+  #members p { margin: 0; }
+</style>
+</head>
+<body>
+
+<h3>Add new club member:</h3>
+
+<div id="member-form">
+  <input type="text" id="first" placeholder="First name" aria-label="First name" autocomplete="off">
+  <input type="text" id="last" placeholder="Last name" aria-label="Last name" autocomplete="off">
+  <button type="button" id="submit-btn">Submit</button>
+</div>
+<p id="message" role="status"></p>
+
+<div id="members"></div>
+
+<script>
+  // The member list is a real JavaScript Set: duplicates can't get in.
+  const members = new Set([
+    "Alice Blue", "Anita Bath", "Billy Sparks", "Eileen Dover", "Ella Vator",
+    "Francisco Portero", "Joe Kerr", "Juanito Lakarin", "Justin Case",
+    "Ligaya Anonuevo", "Paige Turner", "Restituto Fruto", "Sheldon Cooper",
+    "Tam Nguyen"
+  ]);
+
+  const first = document.getElementById("first");
+  const last = document.getElementById("last");
+  const message = document.getElementById("message");
+  const box = document.getElementById("members");
+
+  // Set keys are case-sensitive, so tidy the name into a standard form first.
+  const tidy = s => s.trim().split(/\s+/)
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(" ");
+
+  function render() {
+    const sorted = [...members].sort((a, b) => a.localeCompare(b));
+    box.innerHTML = "";
+    const add = text => {
+      const p = document.createElement("p");
+      p.textContent = text;
+      box.appendChild(p);
+    };
+    add("All members:");
+    sorted.forEach(add);
+    add("Total members: " + members.size);
+  }
+
+  function addMember() {
+    const name = tidy(first.value + " " + last.value);
+
+    if (!first.value.trim() || !last.value.trim()) {
+      message.textContent = "Please enter both a first and last name.";
+      return;
+    }
+    if (members.has(name)) {
+      message.textContent = name + " is already a member.";
+      return;
+    }
+    members.add(name);
+    message.textContent = "";
+    first.value = last.value = "";
+    first.focus();
+    render();
+  }
+
+  document.getElementById("submit-btn").addEventListener("click", addMember);
+  [first, last].forEach(input =>
+    input.addEventListener("keydown", e => { if (e.key === "Enter") addMember(); })
+  );
+
+  render();
+</script>
+</body>
+</html>
